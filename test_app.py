@@ -1,31 +1,39 @@
-import numpy as np
-from model import train_and_predict, get_accuracy
+import pytest
+from app import app
+import json
 
-def test_predictions_not_none():
-    """
-    Test 1: Sprawdza, czy otrzymujemy jakąkolwiek predykcję.
-    """
-    preds, _ = train_and_predict()
-    assert preds is not None, "Predictions should not be None."
+@pytest.fixture
+def client():
+    # Utworzenie testowego klienta Flask
+    app.config["TESTING"] = True
+    client = app.test_client()
+    yield client
 
-def test_predictions_length():
-    """
-    Test 2 (na maksymalną ocenę 5): Sprawdza, czy długość listy predykcji jest większa od 0 i czy odpowiada liczbie próbek testowych.
-    """
-    preds, y_test = train_and_predict()
-    assert len(preds) > 0, "Lista predykcji powinna zawierać co najmniej jeden element."
-    assert len(preds) == len(y_test), f"Długość predykcji ({len(preds)}) nie zgadza się z liczbą próbek testowych ({len(y_test)})."
+def test_home(client):
+    """ Testuje główny endpoint """
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"student" in response.data
 
-def test_predictions_value_range():
-    """
-    Test 3 (na maksymalną ocenę 5): Sprawdza, czy wartości w predykcjach mieszczą się w spodziewanym zakresie: Dla zbioru Iris mamy 3 klasy (0, 1, 2).
-    """
-    preds, _ = train_and_predict()
-    assert all(pred in [0, 1, 2] for pred in preds), f"Predykcje powinny być w zakresie 0-2, ale znaleziono: {set(preds)}"
+def test_predict(client):
+    """ Testuje endpoint /predict """
+    response = client.post("/predict", json={"input": 2.5}, content_type="application/json")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "prediction" in data
+    assert isinstance(data["prediction"], list)
 
-def test_model_accuracy():
-    """
-    Test 4 (na maksymalną ocenę 5): Sprawdza, czy model osiąga co najmniej 70% dokładności.
-    """
-    accuracy = get_accuracy()
-    assert accuracy >= 0.7, f"Dokładność modelu powinna wynosić co najmniej 70%, ale wynosi {accuracy:.2f}"
+
+def test_last_prediction(client):
+    """ Testuje endpoint /last """
+    response = client.get("/last")
+    assert response.status_code == 500  # W przypadku wyłączenia Redis
+    assert b"Redis not enabled" in response.data
+
+def test_api_key(client):
+    """ Testuje endpoint /api_key """
+    response = client.get("/api_key")
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert "api_key" in data
+    assert data["api_key"] == "dummy_key_for_testing"  # Używa domyślnego klucza API
