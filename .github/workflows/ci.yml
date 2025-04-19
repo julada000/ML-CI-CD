@@ -10,9 +10,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest                      # Linux runner :contentReference[oaicite:5]{index=5}
-	env:
-  		API_KEY: dummy_key_for_testing
-
 
     steps:
       - name: Checkout repository
@@ -30,7 +27,7 @@ jobs:
 
       - name: Run pytest
         env:
-          API_KEY: testkey                        # Przykładowe zmienne środowiskowe
+          API_KEY: dummy_key_for_testing                       # Przykładowe zmienne środowiskowe
         run: |
           pytest --maxfail=1 --disable-warnings   # Uruchamia wszystkie testy :contentReference[oaicite:9]{index=9}
 
