@@ -12,15 +12,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.julada000 }}
-          password: ${{ secrets.dckr_pat_8NzbQpE-GxatvCb5t8nML6BaLjE }}
+          password: ${{ secrets.Ju1!8B8b8200^ }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: julada000/your_image_name:latest
+      - name: Build Docker image
+        run: |
+          docker build -t julada000/your_image_name .
+      
+      - name: Push Docker image
+        run: |
+          docker push julada000/your_image_name:latest
