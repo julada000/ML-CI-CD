@@ -1,0 +1,46 @@
+name: CI – Run Tests
+
+# 1) Trigger: push i pull_request do gałęzi main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]                              # Wyzwalacz na PR-y do main :contentReference[oaicite:4]{index=4}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest                      # Linux runner :contentReference[oaicite:5]{index=5}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3                # Klonuje kod repozytorium :contentReference[oaicite:6]{index=6}
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4             # Konfiguruje Pythona :contentReference[oaicite:7]{index=7}
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt         # Instalacja pakietów z requirements.txt :contentReference[oaicite:8]{index=8}
+
+      - name: Run pytest
+        env:
+          API_KEY: testkey                        # Przykładowe zmienne środowiskowe
+        run: |
+          pytest --maxfail=1 --disable-warnings   # Uruchamia wszystkie testy :contentReference[oaicite:9]{index=9}
+
+      - name: Cache dependencies (opcjonalnie)
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-              # Przyspiesza workflow :contentReference[oaicite:10]{index=10}
+
+      - name: Upload test results (opcjonalnie)
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: ./tests/results.xml               # Przykład artefaktów z testów :contentReference[oaicite:11]{index=11}
