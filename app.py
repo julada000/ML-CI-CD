@@ -11,7 +11,7 @@ API_KEY = os.getenv("API_KEY", "dummy_key_for_testing")
 
 
 # Połączenie z Redis (host "redis" zamiast "localhost", bo Docker używa nazw kontenerów)
-redis_client = redis.Redis(host="redis", port=6379, decode_responses=True)
+#redis_client = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 # Przykładowe dane do trenowania modelu ML
 X = np.array([[1], [2], [3], [4], [5]])
@@ -32,7 +32,7 @@ def predict():
         prediction = model.predict(input_value).tolist()
 
         # Zapis wyniku do Redis
-        redis_client.set("last_prediction", prediction[0])
+        #redis_client.set("last_prediction", prediction[0])
 
         return jsonify({"prediction": prediction})
     except Exception as e:
