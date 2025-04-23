@@ -62,3 +62,4 @@ jobs:
         run: |
           IMAGE_NAME=docker.io/${{ secrets.DOCKER_USERNAME }}/ml-ci-cd:latest
           docker push $IMAGE_NAME
+ 
